@@ -325,7 +325,7 @@ function LoginPage({ onLogin }) {
         </div>
 
         <p style={{ textAlign: "center", fontSize: 11, color: "#3a4a5a", marginTop: 20, letterSpacing: 1 }}>
-          FINAL YEAR PROJECT · DEPT. OF EEE · 2024–25
+          FINAL YEAR PROJECT · DEPT. OF ISE · 2025–26
         </p>
       </div>
 
