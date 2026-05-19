@@ -325,7 +325,7 @@ function LoginPage({ onLogin }) {
         </div>
 
         <p style={{ textAlign: "center", fontSize: 11, color: "#3a4a5a", marginTop: 20, letterSpacing: 1 }}>
-          FINAL YEAR PROJECT · DEPT. OF ISE · 2025–26
+          FINAL YEAR PROJECT · DEPT. OF EEE · 2024–25
         </p>
       </div>
 
@@ -681,488 +681,504 @@ function DashboardPage({ sensorData, devices, hourlyData, totalPower, activeCoun
 
 // ─── DEVICES PAGE ─────────────────────────────────────────────────────────────
 
-// ADD THIS INSIDE DevicesPage()
+function DevicesPage({ devices, setDevices, addToast }) {
 
-const [aiMode, setAiMode] = useState("assisted");
-const [aiLogs, setAiLogs] = useState([]);
+  const [aiMode, setAiMode] = useState("assisted");
+  const [aiLogs, setAiLogs] = useState([]);
 
+  const toggle = (id, field) => {
 
-// ADD THIS BELOW toggle FUNCTION
+    setDevices(ds =>
+      ds.map(d =>
+        d.id === id
+          ? { ...d, [field]: !d[field] }
+          : d
+      )
+    );
 
-useEffect(() => {
-
-  if(aiMode !== "auto") return;
-
-  const interval = setInterval(() => {
-
-    setDevices(prevDevices => {
-
-      return prevDevices.map(device => {
-
-        const hour = new Date().getHours();
-
-        const randomIdle = Math.random() > 0.7;
-
-        // AUTO OFF LOGIC
-        if(
-          device.status &&
-          randomIdle &&
-          hour >= 18
-        ){
-
-          setAiLogs(prev => [
-            {
-              id: Date.now() + Math.random(),
-              message: `${device.name} automatically turned OFF due to idle detection`,
-              time: new Date().toLocaleTimeString()
-            },
-            ...prev.slice(0,5)
-          ]);
-
-          addToast(
-            `${device.name} auto shutdown by AI`,
-            "info"
-          );
-
-          return {
-            ...device,
-            status:false
-          };
-
-        }
-
-        // AUTO ON LOGIC
-        if(
-          !device.status &&
-          hour >= 8 &&
-          hour <= 17 &&
-          Math.random() > 0.8
-        ){
-
-          setAiLogs(prev => [
-            {
-              id: Date.now() + Math.random(),
-              message: `${device.name} automatically powered ON for working hours`,
-              time: new Date().toLocaleTimeString()
-            },
-            ...prev.slice(0,5)
-          ]);
-
-          addToast(
-            `${device.name} auto started by AI`,
-            "success"
-          );
-
-          return {
-            ...device,
-            status:true
-          };
-
-        }
-
-        return device;
-
-      });
-
-    });
-
-  }, 8000);
-
-  return () => clearInterval(interval);
-
-}, [aiMode, addToast, setDevices]);
+  };
 
 
 
+  // AI AUTO ON/OFF SYSTEM
 
-// NOW REPLACE ENTIRE return() OF DevicesPage WITH THIS
+  useEffect(() => {
 
+    if (aiMode !== "auto") return;
 
-return (
+    const interval = setInterval(() => {
 
-  <div style={{ animation: "fadeInUp 0.4s ease" }}>
+      setDevices(prevDevices => {
 
-    <div
-      style={{
-        display:"flex",
-        justifyContent:"space-between",
-        alignItems:"center",
-        marginBottom:20
-      }}
-    >
+        return prevDevices.map(device => {
 
-      <SectionTitle
-        title="Device Control Panel"
-        sub="Manage and monitor all industrial devices"
-      />
+          const hour = new Date().getHours();
 
-      <div style={{ display:"flex", gap:10 }}>
+          const randomIdle = Math.random() > 0.7;
 
-        <button
-          onClick={() => {
+          // AUTO OFF
 
-            setDevices(ds =>
-              ds.map(d => ({
-                ...d,
-                status:true
-              }))
-            );
+          if (
+            device.status &&
+            randomIdle &&
+            hour >= 18
+          ) {
+
+            setAiLogs(prev => [
+              {
+                id: Date.now() + Math.random(),
+                message: `${device.name} automatically turned OFF due to idle detection`,
+                time: new Date().toLocaleTimeString()
+              },
+              ...prev.slice(0, 5)
+            ]);
 
             addToast(
-              "All devices powered ON",
-              "success"
-            );
-
-          }}
-          style={{
-            background:"rgba(0,255,136,0.1)",
-            border:"1px solid rgba(0,255,136,0.3)",
-            color:"#00ff88",
-            padding:"8px 16px",
-            borderRadius:8,
-            cursor:"pointer",
-            fontSize:12,
-            letterSpacing:1
-          }}
-        >
-          ALL ON
-        </button>
-
-        <button
-          onClick={() => {
-
-            setDevices(ds =>
-              ds.map(d => ({
-                ...d,
-                status:false
-              }))
-            );
-
-            addToast(
-              "All devices powered OFF",
+              `${device.name} auto shutdown by AI`,
               "info"
             );
 
-          }}
-          style={{
-            background:"rgba(255,80,80,0.1)",
-            border:"1px solid rgba(255,80,80,0.3)",
-            color:"#ff6060",
-            padding:"8px 16px",
-            borderRadius:8,
-            cursor:"pointer",
-            fontSize:12,
-            letterSpacing:1
-          }}
-        >
-          ALL OFF
-        </button>
+            return {
+              ...device,
+              status: false
+            };
 
-      </div>
+          }
 
-    </div>
+          // AUTO ON
 
+          if (
+            !device.status &&
+            hour >= 8 &&
+            hour <= 17 &&
+            Math.random() > 0.8
+          ) {
 
-
-    {/* AI MODE BUTTONS */}
-
-    <div
-      style={{
-        display:"flex",
-        gap:12,
-        marginBottom:20,
-        flexWrap:"wrap"
-      }}
-    >
-
-      {["manual","assisted","auto"].map(mode => (
-
-        <button
-          key={mode}
-          onClick={() => {
-
-            setAiMode(mode);
+            setAiLogs(prev => [
+              {
+                id: Date.now() + Math.random(),
+                message: `${device.name} automatically powered ON for working hours`,
+                time: new Date().toLocaleTimeString()
+              },
+              ...prev.slice(0, 5)
+            ]);
 
             addToast(
-              `AI mode changed to ${mode.toUpperCase()}`,
+              `${device.name} auto started by AI`,
               "success"
             );
 
-          }}
-          style={{
-            background:
-              aiMode === mode
-              ? "rgba(0,255,136,0.15)"
-              : "rgba(255,255,255,0.05)",
+            return {
+              ...device,
+              status: true
+            };
 
-            border:
-              aiMode === mode
-              ? "1px solid #00ff88"
-              : "1px solid rgba(255,255,255,0.1)",
+          }
 
-            color:
-              aiMode === mode
-              ? "#00ff88"
-              : "#aaa",
+          return device;
 
-            padding:"10px 18px",
-            borderRadius:10,
-            cursor:"pointer",
-            fontSize:12,
-            letterSpacing:1
-          }}
-        >
-          {mode.toUpperCase()} MODE
-        </button>
+        });
 
-      ))}
+      });
 
-    </div>
+    }, 8000);
+
+    return () => clearInterval(interval);
+
+  }, [aiMode, addToast, setDevices]);
 
 
 
-    {/* LIVE AI LOGS */}
+  return (
 
-    <div
-      style={{
-        background:"rgba(255,255,255,0.03)",
-        border:"1px solid rgba(0,180,255,0.15)",
-        borderRadius:14,
-        padding:16,
-        marginBottom:20
-      }}
-    >
+    <div style={{ animation: "fadeInUp 0.4s ease" }}>
+
+      {/* TOP HEADER */}
 
       <div
         style={{
-          fontSize:14,
-          color:"#00ff88",
-          marginBottom:12,
-          letterSpacing:1
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 20
         }}
       >
-        LIVE AI ACTION LOGS
+
+        <SectionTitle
+          title="Device Control Panel"
+          sub="Manage and monitor all industrial devices"
+        />
+
+        <div style={{ display: "flex", gap: 10 }}>
+
+          <button
+            onClick={() => {
+
+              setDevices(ds =>
+                ds.map(d => ({
+                  ...d,
+                  status: true
+                }))
+              );
+
+              addToast(
+                "All devices powered ON",
+                "success"
+              );
+
+            }}
+            style={{
+              background: "rgba(0,255,136,0.1)",
+              border: "1px solid rgba(0,255,136,0.3)",
+              color: "#00ff88",
+              padding: "8px 16px",
+              borderRadius: 8,
+              cursor: "pointer",
+              fontSize: 12,
+              letterSpacing: 1
+            }}
+          >
+            ALL ON
+          </button>
+
+          <button
+            onClick={() => {
+
+              setDevices(ds =>
+                ds.map(d => ({
+                  ...d,
+                  status: false
+                }))
+              );
+
+              addToast(
+                "All devices powered OFF",
+                "info"
+              );
+
+            }}
+            style={{
+              background: "rgba(255,80,80,0.1)",
+              border: "1px solid rgba(255,80,80,0.3)",
+              color: "#ff6060",
+              padding: "8px 16px",
+              borderRadius: 8,
+              cursor: "pointer",
+              fontSize: 12,
+              letterSpacing: 1
+            }}
+          >
+            ALL OFF
+          </button>
+
+        </div>
+
       </div>
 
+
+
+      {/* AI MODE BUTTONS */}
+
       <div
         style={{
-          display:"flex",
-          flexDirection:"column",
-          gap:10
+          display: "flex",
+          gap: 12,
+          marginBottom: 20,
+          flexWrap: "wrap"
         }}
       >
 
-        {aiLogs.length === 0 && (
+        {["manual", "assisted", "auto"].map(mode => (
 
-          <div
+          <button
+            key={mode}
+            onClick={() => {
+
+              setAiMode(mode);
+
+              addToast(
+                `AI mode changed to ${mode.toUpperCase()}`,
+                "success"
+              );
+
+            }}
             style={{
-              color:"#666",
-              fontSize:12
+              background:
+                aiMode === mode
+                  ? "rgba(0,255,136,0.15)"
+                  : "rgba(255,255,255,0.05)",
+
+              border:
+                aiMode === mode
+                  ? "1px solid #00ff88"
+                  : "1px solid rgba(255,255,255,0.1)",
+
+              color:
+                aiMode === mode
+                  ? "#00ff88"
+                  : "#aaa",
+
+              padding: "10px 18px",
+              borderRadius: 10,
+              cursor: "pointer",
+              fontSize: 12,
+              letterSpacing: 1
             }}
           >
-            Waiting for AI activity...
-          </div>
-
-        )}
-
-        {aiLogs.map(log => (
-
-          <div
-            key={log.id}
-            style={{
-              background:"rgba(0,0,0,0.25)",
-              padding:"10px 14px",
-              borderRadius:10,
-              border:"1px solid rgba(0,255,136,0.1)",
-              display:"flex",
-              justifyContent:"space-between",
-              alignItems:"center"
-            }}
-          >
-
-            <div
-              style={{
-                color:"#ddd",
-                fontSize:12
-              }}
-            >
-              {log.message}
-            </div>
-
-            <div
-              style={{
-                color:"#00ff88",
-                fontSize:11
-              }}
-            >
-              {log.time}
-            </div>
-
-          </div>
+            {mode.toUpperCase()} MODE
+          </button>
 
         ))}
 
       </div>
 
-    </div>
 
 
+      {/* LIVE AI LOGS */}
 
-    {/* DEVICE CARDS */}
+      <div
+        style={{
+          background: "rgba(255,255,255,0.03)",
+          border: "1px solid rgba(0,180,255,0.15)",
+          borderRadius: 14,
+          padding: 16,
+          marginBottom: 20
+        }}
+      >
 
-    <div
-      style={{
-        display:"grid",
-        gridTemplateColumns:"repeat(auto-fill,minmax(320px,1fr))",
-        gap:16
-      }}
-    >
+        <div
+          style={{
+            fontSize: 14,
+            color: "#00ff88",
+            marginBottom: 12,
+            letterSpacing: 1
+          }}
+        >
+          LIVE AI ACTION LOGS
+        </div>
 
-      {devices.map(d => {
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 10
+          }}
+        >
 
-        const color =
-          d.status
-          ? "#00ff88"
-          : "#666";
-
-        return (
-
-          <GlassCard
-            key={d.id}
-            style={{ padding:20 }}
-          >
+          {aiLogs.length === 0 && (
 
             <div
               style={{
-                display:"flex",
-                justifyContent:"space-between",
-                alignItems:"center",
-                marginBottom:16
+                color: "#666",
+                fontSize: 12
+              }}
+            >
+              Waiting for AI activity...
+            </div>
+
+          )}
+
+          {aiLogs.map(log => (
+
+            <div
+              key={log.id}
+              style={{
+                background: "rgba(0,0,0,0.25)",
+                padding: "10px 14px",
+                borderRadius: 10,
+                border: "1px solid rgba(0,255,136,0.1)",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center"
               }}
             >
 
-              <div>
-
-                <div
-                  style={{
-                    fontSize:16,
-                    fontWeight:600,
-                    color:"#fff"
-                  }}
-                >
-                  {d.name}
-                </div>
-
-                <div
-                  style={{
-                    fontSize:12,
-                    color:"#666",
-                    marginTop:4
-                  }}
-                >
-                  {d.location}
-                </div>
-
-              </div>
-
-              <button
-                onClick={() => toggle(d.id,"status")}
+              <div
                 style={{
-                  background:
-                    d.status
-                    ? "rgba(0,255,136,0.1)"
-                    : "rgba(255,80,80,0.1)",
-
-                  border:
-                    d.status
-                    ? "1px solid rgba(0,255,136,0.3)"
-                    : "1px solid rgba(255,80,80,0.3)",
-
-                  color:
-                    d.status
-                    ? "#00ff88"
-                    : "#ff6060",
-
-                  borderRadius:10,
-                  padding:"8px 16px",
-                  cursor:"pointer",
-                  fontSize:12
+                  color: "#ddd",
+                  fontSize: 12
                 }}
               >
-                {d.status ? "ON" : "OFF"}
-              </button>
+                {log.message}
+              </div>
+
+              <div
+                style={{
+                  color: "#00ff88",
+                  fontSize: 11
+                }}
+              >
+                {log.time}
+              </div>
 
             </div>
 
-            <div
-              style={{
-                display:"grid",
-                gridTemplateColumns:"1fr 1fr",
-                gap:12
-              }}
+          ))}
+
+        </div>
+
+      </div>
+
+
+
+      {/* DEVICE CARDS */}
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill,minmax(320px,1fr))",
+          gap: 16
+        }}
+      >
+
+        {devices.map(d => {
+
+          const color =
+            d.status
+              ? "#00ff88"
+              : "#666";
+
+          return (
+
+            <GlassCard
+              key={d.id}
+              style={{ padding: 20 }}
             >
 
-              <div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 16
+                }}
+              >
 
-                <div
-                  style={{
-                    fontSize:11,
-                    color:"#666",
-                    marginBottom:4
-                  }}
-                >
-                  POWER
+                <div>
+
+                  <div
+                    style={{
+                      fontSize: 16,
+                      fontWeight: 600,
+                      color: "#fff"
+                    }}
+                  >
+                    {d.name}
+                  </div>
+
+                  <div
+                    style={{
+                      fontSize: 12,
+                      color: "#666",
+                      marginTop: 4
+                    }}
+                  >
+                    {d.location}
+                  </div>
+
                 </div>
 
-                <div
+                <button
+                  onClick={() => toggle(d.id, "status")}
                   style={{
-                    fontSize:18,
-                    color:color,
-                    fontFamily:"Orbitron"
+                    background:
+                      d.status
+                        ? "rgba(0,255,136,0.1)"
+                        : "rgba(255,80,80,0.1)",
+
+                    border:
+                      d.status
+                        ? "1px solid rgba(0,255,136,0.3)"
+                        : "1px solid rgba(255,80,80,0.3)",
+
+                    color:
+                      d.status
+                        ? "#00ff88"
+                        : "#ff6060",
+
+                    borderRadius: 10,
+                    padding: "8px 16px",
+                    cursor: "pointer",
+                    fontSize: 12
                   }}
                 >
-                  {(d.power/1000).toFixed(1)}kW
+                  {d.status ? "ON" : "OFF"}
+                </button>
+
+              </div>
+
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: 12
+                }}
+              >
+
+                <div>
+
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: "#666",
+                      marginBottom: 4
+                    }}
+                  >
+                    POWER
+                  </div>
+
+                  <div
+                    style={{
+                      fontSize: 18,
+                      color: color,
+                      fontFamily: "Orbitron"
+                    }}
+                  >
+                    {(d.power / 1000).toFixed(1)}kW
+                  </div>
+
+                </div>
+
+                <div>
+
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: "#666",
+                      marginBottom: 4
+                    }}
+                  >
+                    EFFICIENCY
+                  </div>
+
+                  <div
+                    style={{
+                      fontSize: 18,
+                      color: "#00b4ff",
+                      fontFamily: "Orbitron"
+                    }}
+                  >
+                    {d.efficiency}%
+                  </div>
+
                 </div>
 
               </div>
 
-              <div>
+            </GlassCard>
 
-                <div
-                  style={{
-                    fontSize:11,
-                    color:"#666",
-                    marginBottom:4
-                  }}
-                >
-                  EFFICIENCY
-                </div>
+          );
 
-                <div
-                  style={{
-                    fontSize:18,
-                    color:"#00b4ff",
-                    fontFamily:"Orbitron"
-                  }}
-                >
-                  {d.efficiency}%
-                </div>
+        })}
 
-              </div>
-
-            </div>
-
-          </GlassCard>
-
-        );
-
-      })}
+      </div>
 
     </div>
 
-  </div>
+  );
 
-);
+}
+
 // ─── AI OPTIMIZER PAGE ────────────────────────────────────────────────────────
 
 function AIPage({ addToast }) {
